@@ -1,0 +1,64 @@
+menu "Vortex Hub Example"
+
+    menu "Hub Identity"
+
+        config HUB_ID
+            string "Hub ID"
+            default "VORTEX-HUB-TEST"
+            help
+                Name sent to devices in CALLX_ACK.
+
+        config HUB_PAIR_KEY
+            string "Pair key (32 hex chars)"
+            default "00112233445566778899aabbccddeeff"
+            help
+                Must be the same key as HUB_DEFAULT_PAIR_KEY in the valve.
+
+    endmenu
+
+    menu "Radio"
+
+        config HUB_CHANNEL
+            int "ESP-NOW channel (no router in this example)"
+            range 1 13
+            default 1
+
+    endmenu
+
+    menu "Devices"
+
+        config HUB_MAX_DEVICES
+            int "Max paired devices"
+            range 1 19
+            default 10
+
+        config HUB_DEVICE_TIMEOUT_S
+            int "Device offline after (s) without data"
+            range 10 600
+            default 20
+
+        config HUB_TIME_SYNC_PERIOD_S
+            int "TIME_SYNC to every device every (s)"
+            range 60 86400
+            default 3600
+
+    endmenu
+
+    menu "Test"
+
+        config HUB_TEST_BUTTON_GPIO
+            int "Test button GPIO (BOOT = 0)"
+            range 0 48
+            default 0
+            help
+                Press to send a test cmd_data (valve angle 0 / 90) to every online valve.
+
+        config HUB_TIMEZONE
+            string "Timezone of the build PC (POSIX)"
+            default "IST-5:30"
+            help
+                The test clock starts at the build time of the PC.
+
+    endmenu
+
+endmenu
