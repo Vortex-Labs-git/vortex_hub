@@ -68,6 +68,14 @@ The banner at boot prints the two values the valve needs:
 | 6 | Wrong pair key on the valve | hub: `CALLX ... REFUSED: wrong pair key`; valve: `No valid CALLX_ACK` |
 | 7 | Change `HUB_CHANNEL` on the hub | valve finds the new channel by itself |
 
+## Troubleshooting
+
+| Log | Cause | Fix |
+|---|---|---|
+| `E BOD: Brownout detector was triggered` | 3.3 V drops during WiFi TX current peaks | Good short USB cable, direct PC port or 5 V / 1 A adapter; 100–470 µF across 3V3–GND; keep `HUB_TX_POWER` at 34 (8.5 dBm) on the bench |
+| `CONFIG_HUB_... undeclared` after a pull | `sdkconfig` made before a Kconfig change | `idf.py reconfigure` (or `idf.py fullclean`) |
+| `Detected size(16384k) larger than ... (2048k)` | flash size not set | `idf.py menuconfig` → Serial flasher config → Flash size = your board's size |
+
 ## Limits of this example
 
 - Test clock starts at the build time of the PC (no SNTP / GSM / RTC).

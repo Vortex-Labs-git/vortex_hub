@@ -23,6 +23,15 @@ menu "Vortex Hub Example"
             range 1 13
             default 1
 
+        config HUB_TX_POWER
+            int "Max TX power (0.25 dBm steps, 34 = 8.5 dBm, 84 = 21 dBm)"
+            range 8 84
+            default 34
+            help
+                Lower TX power = lower current peaks while transmitting.
+                Raise it only if the board has a solid 5 V supply
+                (brownout resets mean the supply can not deliver the peaks).
+
     endmenu
 
     menu "Devices"

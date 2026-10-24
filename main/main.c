@@ -58,6 +58,7 @@ static void wifi_init_espnow(void)
     ESP_ERROR_CHECK(esp_wifi_start());
 
     ESP_ERROR_CHECK(esp_wifi_set_ps(WIFI_PS_NONE));            // never miss an ESP-NOW frame
+    ESP_ERROR_CHECK(esp_wifi_set_max_tx_power(CONFIG_HUB_TX_POWER));    // lower TX current peaks (brownout)
     ESP_ERROR_CHECK(esp_wifi_set_channel(CONFIG_HUB_CHANNEL, WIFI_SECOND_CHAN_NONE));
 }
 
@@ -74,7 +75,7 @@ static void print_banner(void)
     ESP_LOGW(TAG_MAIN, " Valve menuconfig -> Vortex Hub Link -> HUB Configuration:");
     ESP_LOGW(TAG_MAIN, "   HUB_DEFAULT_MAC      = " MACSTR, MAC2STR(mac));
     ESP_LOGW(TAG_MAIN, "   HUB_DEFAULT_PAIR_KEY = %s", CONFIG_HUB_PAIR_KEY);
-    ESP_LOGW(TAG_MAIN, " Channel: %d", CONFIG_HUB_CHANNEL);
+    ESP_LOGW(TAG_MAIN, " Channel: %d   TX power: %.2f dBm", CONFIG_HUB_CHANNEL, CONFIG_HUB_TX_POWER * 0.25);
     ESP_LOGW(TAG_MAIN, "==================================================");
 }
 
