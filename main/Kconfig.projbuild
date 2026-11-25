@@ -1,72 +1,58 @@
-menu "Vortex Hub Example"
+menu "Vortex Hub"
 
     menu "Hub Identity"
 
-        config HUB_ID
-            string "Hub ID"
-            default "VORTEX-HUB-TEST"
+        config HUB_ID_RESET
+            bool "Reset hub identity to default"
+            default n
             help
-                Name sent to devices in CALLX_ACK.
+                Overwrite the stored hub ID with the value below on every boot.
 
-        config HUB_PAIR_KEY
-            string "Pair key (32 hex chars)"
-            default "00112233445566778899aabbccddeeff"
+        config HUB_ID
+            string "Hub ID (= hub Wi-Fi name, must start with VHUB)"
+            default "VHUB202611001"
             help
-                Must be the same key as HUB_DEFAULT_PAIR_KEY in the valve.
+                Devices that join a Wi-Fi whose name starts with "VHUB"
+                use the hub's local MQTT broker.
 
     endmenu
 
-    menu "Radio"
+    menu "Hub Wi-Fi (devices connect here)"
 
-        config HUB_CHANNEL
-            int "ESP-NOW channel (no router in this example)"
-            range 1 13
-            default 1
+        config HUB_AP_PASSWORD
+            string "Hub Wi-Fi password (min 8 characters)"
+            default "12345678"
+
+        config HUB_AP_MAX_CLIENTS
+            int "Max devices on the hub Wi-Fi"
+            range 1 15
+            default 10
 
         config HUB_TX_POWER
             int "Max TX power (0.25 dBm steps, 34 = 8.5 dBm, 84 = 21 dBm)"
             range 8 84
             default 34
             help
-                Lower TX power = lower current peaks while transmitting.
-                Raise it only if the board has a solid 5 V supply
-                (brownout resets mean the supply can not deliver the peaks).
+                Lower = smaller current peaks (no brownout on a weak supply),
+                but shorter range for the devices. Raise it on a solid 5 V supply.
 
     endmenu
 
-    menu "Devices"
+    menu "Router (internet for hub and devices)"
 
-        config HUB_MAX_DEVICES
-            int "Max paired devices"
-            range 1 19
-            default 10
-
-        config HUB_DEVICE_TIMEOUT_S
-            int "Device offline after (s) without data"
-            range 10 600
-            default 20
-
-        config HUB_TIME_SYNC_PERIOD_S
-            int "TIME_SYNC to every device every (s)"
-            range 60 86400
-            default 3600
-
-    endmenu
-
-    menu "Test"
-
-        config HUB_TEST_BUTTON_GPIO
-            int "Test button GPIO (BOOT = 0)"
-            range 0 48
-            default 0
+        config HUB_WIFI_RESET
+            bool "Reset Wi-Fi settings to default"
+            default n
             help
-                Press to send a test cmd_data (valve angle 0 / 90) to every online valve.
+                Overwrite the stored router / hub Wi-Fi settings on every boot.
 
-        config HUB_TIMEZONE
-            string "Timezone of the build PC (POSIX)"
-            default "IST-5:30"
-            help
-                The test clock starts at the build time of the PC.
+        config HUB_ROUTER_SSID
+            string "Router SSID (empty = offline hub)"
+            default "OPPO_A78"
+
+        config HUB_ROUTER_PASSWORD
+            string "Router password"
+            default "12345679"
 
     endmenu
 
