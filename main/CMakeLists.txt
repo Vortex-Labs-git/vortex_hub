@@ -4,6 +4,7 @@ idf_component_register(SRCS
                             "eeprom_fn/id_storage.c"
                             "eeprom_fn/wifi_storage.c"
                             "wifi_fn/wifi_hub.c"
+                            "broker_fn/local_broker.c"
                         INCLUDE_DIRS
                             "."
                         REQUIRES

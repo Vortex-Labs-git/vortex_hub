@@ -321,3 +321,16 @@ void wifi_hub_router_ip(char *out, size_t out_size)
         snprintf(out, out_size, IPSTR, IP2STR(&ip.ip));
     }
 }
+
+/**
+ * @brief Hub's IP on its own Wi-Fi (the devices' gateway, normally 192.168.4.1)
+ */
+void wifi_hub_ap_ip(char *out, size_t out_size)
+{
+    esp_netif_ip_info_t ip;
+
+    out[0] = '\0';
+    if (esp_netif_get_ip_info(s_ap_netif, &ip) == ESP_OK) {
+        snprintf(out, out_size, IPSTR, IP2STR(&ip.ip));
+    }
+}

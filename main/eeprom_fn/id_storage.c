@@ -8,8 +8,8 @@
  *  - Saves it to NVS
  *  - Restores the default identity from menuconfig (factory reset)
  *
- * The hub's own Wi-Fi name is the hub ID itself ("VHUB2026001"), so
- * devices know they joined a hub when the SSID starts with "VHUB".
+ * Hub ID "VHUB202611001" -> hub Wi-Fi name "Vortex_VHUB202611001".
+ * Devices know they joined a hub when the SSID starts with "Vortex_VHUB".
  */
 
 #include <string.h>
@@ -27,8 +27,11 @@
 /* Default hub ID from menuconfig (the seed value for a fresh hub) */
 #define DEFAULT_HUB_ID        CONFIG_HUB_ID
 
-/* Every hub ID must start with this (devices check the SSID for it) */
+/* Every hub ID must start with this (devices check the SSID for "Vortex_VHUB") */
 #define HUB_ID_PREFIX         "VHUB"
+
+/* Prefix used to build the hub Wi-Fi name from the hub ID (same as the devices) */
+#define AP_SSID_PREFIX        "Vortex_"
 
 #define ID_NVS_NAMESPACE      "id_cfg"
 #define ID_NVS_KEY            "identity"
@@ -121,15 +124,14 @@ esp_err_t id_storage_save(void) {
 void id_storage_restore_default(void) {
     memset(&hubIdentity, 0, sizeof(HubIdentity));
 
-    strlcpy(hubIdentity.hub_id,  DEFAULT_HUB_ID, sizeof(hubIdentity.hub_id));
-    strlcpy(hubIdentity.ap_ssid, DEFAULT_HUB_ID, sizeof(hubIdentity.ap_ssid));
+    strlcpy(hubIdentity.hub_id, DEFAULT_HUB_ID, sizeof(hubIdentity.hub_id));
+    snprintf(hubIdentity.ap_ssid, sizeof(hubIdentity.ap_ssid), "%s%s", AP_SSID_PREFIX, hubIdentity.hub_id);
 
     if (strncmp(hubIdentity.hub_id, HUB_ID_PREFIX, strlen(HUB_ID_PREFIX)) != 0) {
-        ESP_LOGE(TAG_ID, "HUB_ID \"%s\" does not start with \"%s\": devices will not see it as a hub",
-                 hubIdentity.hub_id, HUB_ID_PREFIX);
+        ESP_LOGE(TAG_ID, "HUB_ID \"%s\" does not start with \"%s\": devices will not see it as a hub", hubIdentity.hub_id, HUB_ID_PREFIX);
     }
 
     id_storage_save();
 
-    ESP_LOGI(TAG_ID, "Identity restored to default (id=%s)", hubIdentity.hub_id);
+    ESP_LOGI(TAG_ID, "Identity restored to default (id=%s, ap_ssid=%s)", hubIdentity.hub_id, hubIdentity.ap_ssid);
 }

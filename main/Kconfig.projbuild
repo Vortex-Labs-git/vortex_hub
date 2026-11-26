@@ -9,11 +9,12 @@ menu "Vortex Hub"
                 Overwrite the stored hub ID with the value below on every boot.
 
         config HUB_ID
-            string "Hub ID (= hub Wi-Fi name, must start with VHUB)"
+            string "Hub ID (must start with VHUB, Wi-Fi name = Vortex_<ID>)"
             default "VHUB202611001"
             help
-                Devices that join a Wi-Fi whose name starts with "VHUB"
-                use the hub's local MQTT broker.
+                The hub Wi-Fi is "Vortex_" + this ID. Devices that join a
+                Wi-Fi whose name starts with "Vortex_VHUB" use the hub's
+                local MQTT broker.
 
     endmenu
 
@@ -38,6 +39,18 @@ menu "Vortex Hub"
 
     endmenu
 
+
+    menu "Local MQTT broker"
+
+        config HUB_BROKER_LOG
+            bool "Log every message that passes the broker"
+            default y
+            help
+                For bench testing. Turn off once the hub is in use.
+
+    endmenu
+
+    
     menu "Router (internet for hub and devices)"
 
         config HUB_WIFI_RESET

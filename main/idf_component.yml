@@ -1,0 +1,6 @@
+## IDF Component Manager Manifest File
+dependencies:
+  idf:
+    version: ">=5.1"
+  # Local MQTT broker (Espressif port of mosquitto)
+  espressif/mosquitto: "^2.0.20"

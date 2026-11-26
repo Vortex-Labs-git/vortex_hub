@@ -1,17 +1,19 @@
 /**
  * @file main.c
- * @brief Vortex Hub (ESP32-S3) — step 1a: hub Wi-Fi + router + NAT
+ * @brief Vortex Hub (ESP32-S3) — step 1b: hub Wi-Fi + NAT + local MQTT broker
  *
  * Devices (valve, sensor unit, plug) join the hub's own Wi-Fi
- * ("VHUB2026001"). The hub connects to the router and routes the
- * devices to the internet, so they still reach the server, OTA and SNTP.
+ * ("Vortex_VHUB202611001") and use the hub's local MQTT broker.
+ * The hub connects to the router and routes the devices to the
+ * internet, so they still reach OTA and SNTP.
  *
  * Start-up:
  *  1. NVS, netif, event loop
  *  2. Hub identity (hub ID = Wi-Fi name)
  *  3. Wi-Fi settings (router, hub Wi-Fi password)
  *  4. Hub Wi-Fi (AP) + router (STA) + NAT
- *  5. Status line every 30 s
+ *  5. Local MQTT broker (port 1883 on the hub Wi-Fi)
+ *  6. Status line every 30 s
  */
 
 #include <string.h>
@@ -26,6 +28,7 @@
 #include "eeprom_fn/id_storage.h"
 #include "eeprom_fn/wifi_storage.h"
 #include "wifi_fn/wifi_hub.h"
+#include "broker_fn/local_broker.h"
 
 
 #define STATUS_PERIOD_MS    30000
@@ -62,9 +65,9 @@ void app_main(void)
 #endif
     wifi_storage_load();
 
-
     wifi_hub_start();
 
+    local_broker_start();
 
     /* Status line (the web UI shows the same later) */
     while (1) {
