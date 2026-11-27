@@ -13,9 +13,9 @@
  * The broker listens only on the hub Wi-Fi (not on the router LAN).
  *
  * Callbacks (run inside the broker task, keep them short):
- *   on_client_connect  -> every device that connects (client id = device_id)
- *   on_broker_message  -> every message that passes the broker
- *                         (step 1c: update the local DB from here)
+ *   on_client_connect  -> accept devices in the hub's device list (client id = device_id)
+ *                         and the hub's own bridge client
+ *   on_broker_message  -> every message: copied to the MQTT bridge queue
  */
 
 #include <string.h>
@@ -27,6 +27,9 @@
 
 #include "local_broker.h"
 #include "wifi_fn/wifi_hub.h"
+#include "mqtt_fn/mqtt_bridge.h"
+#include "mqtt_fn/local_client.h"
+#include "device_fn/vortex_dev.h"
 
 
 #define BROKER_TASK_STACK   (32 * 1024)     // same as the mosquitto example
@@ -46,12 +49,30 @@ static char s_listen_ip[16];
 /**
  * @brief A client connects (devices use their device_id as client id)
  *
- * @return 0 = accept. Step 1c/1d: accept only devices assigned to the hub.
+ * @return 0 = accept, 1 = reject
  */
 static int on_client_connect(const char *client_id, const char *username, const char *password, int password_len)
 {
-    ESP_LOGI(TAG, "Client connected: %s", client_id ? client_id : "(no id)");
+    if (client_id == NULL) {
+        return 1;
+    }
+
+    if (strcmp(client_id, local_client_id()) == 0) {
+        return 0;                                       // the hub's own bridge client
+    }
+
+    if (vortex_dev_find(client_id) != NULL) {
+        ESP_LOGI(TAG, "Device connected: %s", client_id);
+        return 0;
+    }
+
+#if CONFIG_HUB_BROKER_ALLOW_UNKNOWN
+    ESP_LOGW(TAG, "Unknown client %s accepted (HUB_BROKER_ALLOW_UNKNOWN)", client_id);
     return 0;
+#else
+    ESP_LOGW(TAG, "Unknown client %s rejected (not in the device list)", client_id);
+    return 1;
+#endif
 }
 
 /**
@@ -61,9 +82,16 @@ static int on_client_connect(const char *client_id, const char *username, const 
  */
 static void on_broker_message(char *client, char *topic, char *data, int len, int qos, int retain)
 {
+    /* Device messages go to the bridge; the hub's own commands to the devices do not */
+    if (client == NULL || strcmp(client, local_client_id()) != 0) {
+        mqtt_bridge_from_device(topic, data, len);
+    }
+
 #if CONFIG_HUB_BROKER_LOG
     int shown = (len < LOG_DATA_MAX) ? len : LOG_DATA_MAX;
-    ESP_LOGI(TAG, "%s -> %s (%d B%s)\n%.*s%s", client ? client : "?", topic, len, retain ? ", retained" : "", shown, data, (len > shown) ? " ..." : "");
+    ESP_LOGI(TAG, "%s -> %s (%d B%s)\n%.*s%s",
+             client ? client : "?", topic, len, retain ? ", retained" : "",
+             shown, data, (len > shown) ? " ..." : "");
 #endif
 }
 
