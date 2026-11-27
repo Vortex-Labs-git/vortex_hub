@@ -41,12 +41,37 @@ menu "Vortex Hub"
 
 
     menu "Local MQTT broker"
-
         config HUB_BROKER_LOG
             bool "Log every message that passes the broker"
             default y
             help
                 For bench testing. Turn off once the hub is in use.
+
+        config HUB_BROKER_ALLOW_UNKNOWN
+            bool "Accept clients that are not in the device list"
+            default y
+            help
+                For bench testing (laptop with mosquitto_sub). Turn off so
+                only the listed devices can connect.
+
+    endmenu
+
+
+    menu "Devices (expected on this hub)"
+        config HUB_DEVICE_TIMEOUT_S
+            int "Device offline after (s) without data"
+            range 10 600
+            default 30
+
+    endmenu
+
+
+    menu "Server"
+        config HUB_SERVER_BROKER_URI
+            string "Server MQTT broker"
+            default "mqtts://82.29.161.52:8882"
+            help
+                Same broker the devices use on a normal router.
 
     endmenu
 

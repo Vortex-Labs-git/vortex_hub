@@ -3,14 +3,26 @@ idf_component_register(SRCS
                             "global_fn/global_var.c"
                             "eeprom_fn/id_storage.c"
                             "eeprom_fn/wifi_storage.c"
+                            "eeprom_fn/device_storage.c"
                             "wifi_fn/wifi_hub.c"
                             "broker_fn/local_broker.c"
+                            "device_fn/vortex_dev.c"
+                            "device_fn/vortex_va.c"
+                            "device_fn/vortex_su.c"
+                            "device_fn/vortex_sp.c"
+                            "mqtt_fn/mqtt_bridge.c"
+                            "mqtt_fn/cloud_client.c"
+                            "mqtt_fn/local_client.c"
                         INCLUDE_DIRS
                             "."
+                        EMBED_TXTFILES
+                            "mqtt_fn/ca_cert.pem"
                         REQUIRES
                             esp_wifi
                             esp_netif
                             esp_event
                             esp_timer
                             nvs_flash
+                            mqtt
+                            json
                             )
